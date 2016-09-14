@@ -1,0 +1,49 @@
+#!/bin/sh
+
+# Thomas Haynes - scipt that first applied the blueprint to the ambari server,
+# followed by the host_mapping (which begins the cluster provisioning)
+touch /var/log/ambari-server/initialise_cluster.log
+
+ambari_user=<%= scope.lookupvar("ambari_server::params::ambari_ui_user")  %>
+ambari_password=<%= scope.lookupvar("ambari_server::params::ambari_ui_password")  %>
+cluster_name=<%= scope.lookupvar("ambari_server::params::cluster_name")  %>
+cluster_mode=<%= scope.lookupvar("ambari_server::params::cluster_mode")  %>
+cluster_size=<%= scope.lookupvar("ambari_server::blueprint::cluster_size")  %>
+blueprint_version=<%= scope.lookupvar("ambari_server::params::blueprint_version") %>
+blueprint_path=<%= scope.lookupvar("ambari_server::params::blueprint_path") %>
+ambari_api="http://127.0.0.1:8080/api/v1"
+CURL_OPTIONS="-s --user $ambari_user:$ambari_password -H X-Requested-By:mycompany"
+log_path="/var/log/ambari-server/initialise_cluster.log"
+
+hosts=$(curl ${CURL_OPTIONS} ${ambari_api}/hosts | python /etc/ambari-server/scripts/get_registered_hosts.py)
+
+if [ ${hosts} == ${cluster_size} ]; then
+
+  if [ ! -e ${blueprint_path} -o ! -e ${blueprint_path}/hdp_hadoop_blueprint.json -o ! -e ${blueprint_path}/hdp_hadoop_hostmapping.json ]; then
+    echo "$(date) ERROR - Blueprint definition/hostmapping not available. Check ${blueprint_path}"
+    exit 1
+  fi
+
+  # register blueprint
+  curl ${CURL_OPTIONS} \
+  	-X POST ${ambari_api}/blueprints/blueprint-${blueprint_version} \
+  	-d @${blueprint_path}/hdp_hadoop_blueprint.json
+
+  if [ $? -ne 0 ]; then
+    echo "$(date) ERROR - Couldn't register blueprint" >> ${log_path}
+    exit 1
+  fi
+
+  # apply hosts mapping
+  curl ${CURL_OPTIONS} \
+  	-X POST ${ambari_api}/clusters/${cluster_name} \
+  	-d @${blueprint_path}/hdp_hadoop_hostmapping.json
+
+  if [ $? -ne 0 ]; then
+    echo "$(date) ERROR - Cluster instantiation failed please check Ambari-server logs and UI" >> ${log_path}
+    exit 1
+  fi
+else
+  echo "$(date) WARN - Not all hosts have registered yet.. will retry next puppet run" >> ${log_path}
+  exit 1
+fi

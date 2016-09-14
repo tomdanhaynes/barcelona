@@ -1,0 +1,29 @@
+#!/bin/bash
+
+#Script for initial ambari-server setup
+
+<% if scope.lookupvar("ambari_server::params::ambari_database_type") == 'embedded' %>
+ambari-server setup -s --java-home /opt/java &> /var/log/ambari-server/ambari-server-setup.out
+<% else %>
+ambari-server setup \
+	-s \
+	--java-home /opt/java \
+  	--database=<%= scope.lookupvar("ambari_server::params::ambari_database_type")%> \
+  	--databasehost=<%= scope.lookupvar("ambari_server::params::ambari_database_host")%> \
+  	--databaseport=<%= scope.lookupvar("ambari_server::params::ambari_database_port")%> \
+  	--databasename=<%= scope.lookupvar("ambari_server::params::ambari_database_name")%> \
+  	--postgresschema=<%= scope.lookupvar("ambari_server::params::ambari_database_postgres_schema")%> \
+  	--databaseusername=<%= scope.lookupvar("ambari_server::params::ambari_database_username")%> \
+  	--databasepassword=<%= scope.lookupvar("ambari_server::params::ambari_database_password")%> \
+  	--jdbc-driver=<%= scope.lookupvar("ambari_server::params::ambari_database_jdbc_driver")%> \
+  	--jdbc-db=<%= scope.lookupvar("ambari_server::params::ambari_database_jdbc_db")%> \
+  	&> /var/log/ambari-server/ambari-server-setup.out
+<% end %>
+
+if  [ $? = "0" ]
+then
+  /bin/touch /etc/ambari-server/ambari-setup
+  /bin/chmod 700 /etc/ambari-server/ambari-setup
+else
+  exit 1
+fi

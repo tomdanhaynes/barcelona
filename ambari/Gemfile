@@ -1,0 +1,10 @@
+source 'https://rubygems.org'
+
+gem 'beaker-rspec'
+gem 'puppet'
+gem 'facter'
+gem 'rspec-puppet'
+gem 'rake'
+gem 'puppetlabs_spec_helper'
+gem 'net-ssh-gateway'
+gem 'vagrant-wrapper'

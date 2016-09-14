@@ -1,0 +1,33 @@
+#!/bin/sh
+##
+## Check if a cluster is already being managed by Ambari
+## The script exits with 0 only if no cluster is being configured
+##
+
+AMBARI_USER=<%= scope.lookupvar("ambari_server::params::ambari_ui_user")%>
+AMBARI_PASSWORD=<%= scope.lookupvar("ambari_server::params::ambari_ui_password")%>
+AMBARI_API=http://localhost:8080/api/v1/clusters
+
+# Check that Ambari Server is running
+ret=$(curl -s -u $AMBARI_USER:$AMBARI_PASSWORD -H "X-Requested-By: $AMBARI_USER" $AMBARI_API)
+if [ $? -ne 0 ]; then
+	echo 'Error retrieving cluster names. Ambari Server likely not started or ready.'
+    exit 1
+fi;
+
+# Check the number of cluster configured
+cluster_count=$(echo $ret | python -c "import json,sys; a = json.load(sys.stdin)['items']; print len(a)")
+if [ $? -ne 0 ]; then
+    echo 'Error retrieving cluster count.'
+    exit 1
+fi;
+
+if [ $cluster_count -eq 0 ]; then
+    echo 'No cluster configured.'
+    exit 0
+else
+    cluster_name=$(echo $ret | python -c "import json,sys; print json.load(sys.stdin)['items'][0]['Clusters']['cluster_name'];")
+    echo "Cluster already configured ($cluster_name)"
+    exit 1
+fi;
+

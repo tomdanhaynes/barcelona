@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Thomas Haynes - scipt that first applied the blueprint to the ambari server,
+# followed by the host_mapping (which begins the cluster provisioning)
+
+#TODO - automate this with the puppet module
+
+
+
+curl --user admin:admin -H 'X-Requested-By:mycompany' -X POST http://127.0.0.1:8080/api/v1/blueprints/blueprint-c1 -d @/etc/ambari-server/blueprints/hdp_hadoop_blueprint.json
+
+
+
+curl --user admin:admin -H 'X-Requested-By:mycompany' -X POST http://127.0.0.1:8080/api/v1/clusters/<%= scope.lookupvar("ambari_server::params::cluster_name") %> -d @/etc/ambari-server/blueprints/hdp_hadoop_hostmapping.json

@@ -1,0 +1,37 @@
+{ "blueprint":"blueprint-<%= scope.lookupvar("ambari_server::params::blueprint_version") %>",
+  "host_groups":[
+                  { "name":"name_node",
+                    "hosts":[
+                              { "fqdn":"<%= scope.lookupvar("ambari_server::params::name_node_fqdn_man") %>"}
+                            ]
+                  },
+
+                  { "name":"secondary_name_node",
+                    "hosts":[
+                              { "fqdn":"<%= scope.lookupvar("ambari_server::params::secondary_name_node_fqdn_man") %>"}
+                            ]
+                  },
+
+                  { "name":"data_node",
+                    "hosts":[
+                              { "fqdn":"<%= scope.lookupvar("ambari_server::params::data_node1_fqdn_man") %>"},
+                              { "fqdn":"<%= scope.lookupvar("ambari_server::params::data_node2_fqdn_man") %>"},
+                              { "fqdn":"<%= scope.lookupvar("ambari_server::params::data_node3_fqdn_man") %>"},
+                              { "fqdn":"<%= scope.lookupvar("ambari_server::params::data_node4_fqdn_man") %>"},
+                              { "fqdn":"<%= scope.lookupvar("ambari_server::params::data_node5_fqdn_man") %>"},
+                              { "fqdn":"<%= scope.lookupvar("ambari_server::params::data_node6_fqdn_man") %>"},
+                              { "fqdn":"<%= scope.lookupvar("ambari_server::params::data_node7_fqdn_man") %>"},
+                              { "fqdn":"<%= scope.lookupvar("ambari_server::params::data_node8_fqdn_man") %>"},
+                              { "fqdn":"<%= scope.lookupvar("ambari_server::params::data_node9_fqdn_man") %>"}
+                            ]
+                  },
+
+                  { "name":"zookeeper_node",
+                    "hosts":[
+                              { "fqdn":"<%= scope.lookupvar("ambari_server::params::zookeeper_server1_fqdn_man") %>"},
+                              { "fqdn":"<%= scope.lookupvar("ambari_server::params::zookeeper_server2_fqdn_man") %>"},
+                              { "fqdn":"<%= scope.lookupvar("ambari_server::params::zookeeper_server3_fqdn_man") %>"}
+                            ]
+                  }
+                ]
+}

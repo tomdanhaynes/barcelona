@@ -1,0 +1,48 @@
+#!/bin/bash
+
+#Script for initial db setup for external DATABASE
+
+<% if scope.lookupvar("ambari_server::params::ambari_database_type") == 'embedded' %>
+export PGPASSWORD=$(cat /etc/ambari-server/conf/password.dat)
+DB_HOST=localhost
+DB_PORT=5432
+<% else %>
+export PGPASSWORD=<%= scope.lookupvar("ambari_server::params::ambari_database_password")%>
+DB_HOST=<%= scope.lookupvar("ambari_server::params::ambari_database_host")%>
+DB_PORT=<%= scope.lookupvar("ambari_server::params::ambari_database_port")%>
+<% end %>
+DB_NAME=<%= scope.lookupvar("ambari_server::params::ambari_database_name")%>
+DB_USERNAME=<%= scope.lookupvar("ambari_server::params::ambari_database_username")%>
+DB_SCHEMA=<%= scope.lookupvar("ambari_server::params::ambari_database_postgres_schema")%>
+
+#create schema
+/usr/bin/psql -h ${DB_HOST} -p ${DB_PORT} -d ${DB_NAME} -U ${DB_USERNAME} \
+              -c "CREATE SCHEMA ${DB_SCHEMA}"
+if [ $? != 0 ]; then
+    echo "Ambari schema creation failed"
+    exit 1
+fi
+
+#setup schema
+/usr/bin/psql -h ${DB_HOST} -p ${DB_PORT} -d ${DB_NAME} -U ${DB_USERNAME} \
+              -c "ALTER SCHEMA ${DB_SCHEMA} OWNER TO ${DB_USERNAME}"
+if [ $? != 0 ]; then
+    echo "Ambari schema setup failed"
+    exit 1
+fi
+
+/usr/bin/psql -h ${DB_HOST} -p ${DB_PORT} -d ${DB_NAME} -U ${DB_USERNAME} \
+              -c "ALTER ROLE ${DB_USERNAME} SET search_path to '${DB_SCHEMA}','public'"
+
+if [ $? != 0 ]; then
+    echo "Ambari schema setup failed"
+    exit 1
+fi
+
+# Now run in sql to populate schema
+/usr/bin/psql -h ${DB_HOST} -p ${DB_PORT} -d ${DB_NAME} -U ${DB_USERNAME} \
+              -f "/var/lib/ambari-server/resources/Ambari-DDL-Postgres-CREATE.sql"
+if [ $? != 0 ]; then
+    echo "Populating Ambari schema failed"
+    exit 1
+fi

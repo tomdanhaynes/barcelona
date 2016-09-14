@@ -1,0 +1,48 @@
+{
+  "blueprint":"blueprint-<%= scope.lookupvar("ambari_server::params::blueprint_version") %>",
+  "host_groups":[
+    {
+      "name":"host_group_namenode_active",
+      "hosts":[
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::master_node1_fqdn") %>"}
+      ]
+    },
+
+    {
+      "name":"host_group_namenode_passive",
+      "hosts":[
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::master_node2_fqdn") %>"}
+      ]
+    },
+
+    {
+      "name":"host_group_zk_1",
+      "hosts":[
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::master_node3_fqdn") %>"}
+      ]
+    },
+
+    {
+      "name":"host_group_zk_2",
+      "hosts":[
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::master_node4_fqdn") %>"},
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::master_node5_fqdn") %>"}
+      ]
+    },
+
+    {
+      "name":"host_group_worker",
+      "hosts":[
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::worker_node1_fqdn") %>"},
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::worker_node2_fqdn") %>"},
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::worker_node3_fqdn") %>"},
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::worker_node4_fqdn") %>"},
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::worker_node5_fqdn") %>"},
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::worker_node6_fqdn") %>"},
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::worker_node7_fqdn") %>"},
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::worker_node8_fqdn") %>"},
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::worker_node9_fqdn") %>"}
+      ]
+    }
+  ]
+}

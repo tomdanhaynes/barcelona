@@ -1,0 +1,28 @@
+{
+  "project_page": "https://blog.codecentric.de/en/2014/04/hadoop-cluster-automation/",
+  "license": "Apache License, Version 2.0",
+  "source": "UNKNOWN",
+  "types": [
+
+  ],
+  "description": "This modules prepares the hosts for Ambari and installs Agent/Server service. This means that firewall services \nare stopped, ntp is installed and started, machines, the agent/clients are installed&started and finally the Ambari \nclients are given information on where to find the server machine. ",
+  "version": "0.0.2",
+  "summary": "This module installs Ambari (the hadoop management and monitoring system) agent and/or server. It is tested with CentOS (6.4). ",
+  "name": "vzach-ambari",
+  "author": "Valentin Zacharias and Malte Nottmeyer",
+  "checksums": {
+    "manifests/simple_ntp.pp": "d3ab50beb05d56463ee80caa5a33459e",
+    "manifests/server.pp": "3ad2d81e18a6411a7a70347c8deb991f",
+    "manifests/init.pp": "28b456984be234a51d649d25b7a0743e",
+    "manifests/agent.pp": "48cae9d87a647e97a4fd61c3cb8ba7db",
+    "manifests/disable_services.pp": "2839845314252b379693899428ff33c7",
+    "README": "18b99de48375cec383ba8b6cae3d6601",
+    "Modulefile": "dba1d38be7beed127e511e86c8f69b34"
+  },
+  "dependencies": [
+    {
+      "version_requirement": ">=3.2.1",
+      "name": "puppetlabs-stdlib"
+    }
+  ]
+}

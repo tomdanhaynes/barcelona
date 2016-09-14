@@ -1,0 +1,15 @@
+#!/usr/bin/expect
+
+# Script to regularly sync to ldap
+
+spawn /usr/sbin/ambari-server sync-ldap --groups /etc/ambari-server/conf/ldap-groups.txt
+
+expect "Enter Ambari Admin login:"
+
+send "<%= @ambari_ui_user -%>\r"
+
+expect "Enter Ambari Admin password:"
+
+send "<%= @ambari_ui_password -%>\r"
+
+expect eof

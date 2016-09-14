@@ -1,0 +1,11 @@
+#!/bin/sh
+
+var1=$(curl -i -s http://<%= @ambari_ui_user -%>:<%= @ambari_ui_password -%>@localhost:8080/api/v1/users | grep user_name | grep <%= @ambari_ui_user -%> | wc -l)
+
+if [ "$var1" -lt 1 ]; then 
+  echo "Ambari UI FAILED" > /var/log/ambari-ui-status.log
+  exit 1
+else
+  echo "Ambari UI returned OK" > /var/log/ambari-ui-status.log
+  exit 0
+fi

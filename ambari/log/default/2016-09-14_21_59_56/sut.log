@@ -1,0 +1,4 @@
+2016-09-14 22:01:16	[+]	vagrant	el-6-x86_64	puppet-master.np-ii-test1
+2016-09-14 22:01:16	[+]	vagrant	el-6-x86_64	puppet-agent.np-ii-test1
+2016-09-14 22:07:11	[-]	vagrant	el-6-x86_64	puppet-master.np-ii-test1
+2016-09-14 22:07:11	[-]	vagrant	el-6-x86_64	puppet-agent.np-ii-test1

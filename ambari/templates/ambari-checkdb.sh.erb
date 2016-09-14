@@ -1,0 +1,32 @@
+#!/bin/bash
+
+#Script for checking whether db is ready to be setup, and whether it already has been
+
+<% if scope.lookupvar("ambari_server::params::ambari_database_type") == 'embedded' %>
+export PGPASSWORD=$(cat /etc/ambari-server/conf/password.dat)
+DB_HOST=localhost
+DB_PORT=5432
+<% else %>
+export PGPASSWORD=<%= scope.lookupvar("ambari_server::params::ambari_database_password")%>
+DB_HOST=<%= scope.lookupvar("ambari_server::params::ambari_database_host")%>
+DB_PORT=<%= scope.lookupvar("ambari_server::params::ambari_database_port")%>
+<% end %>
+DB_NAME=<%= scope.lookupvar("ambari_server::params::ambari_database_name")%>
+DB_USERNAME=<%= scope.lookupvar("ambari_server::params::ambari_database_username")%>
+DB_SCHEMA=<%= scope.lookupvar("ambari_server::params::ambari_database_postgres_schema")%>
+
+#determine whether database exists
+/usr/bin/psql -h ${DB_HOST} -p ${DB_PORT} -d ${DB_NAME} -U ${DB_USERNAME} -c "\l"
+
+if [ $? != 0 ]; then
+	echo "ambari database not yet created"
+	exit 1
+else
+  #now check whether schema has been created
+  /usr/bin/psql -h ${DB_HOST} -p ${DB_PORT} -d ${DB_NAME} -U ${DB_USERNAME} -c "\dn" | grep -q ${DB_SCHEMA}
+  if [ $? == 0 ]; then
+  	exit 1
+  else
+    exit 0
+  fi
+fi

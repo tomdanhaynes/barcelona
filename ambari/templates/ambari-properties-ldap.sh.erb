@@ -1,0 +1,97 @@
+#!/bin/bash
+
+AMBARI_SERVER_PROPERTIES=/etc/ambari-server/conf/ambari.properties
+
+
+check_ldap_properties() {
+  grep -e "ambari.ldap.isConfigured" /etc/ambari-server/conf/ambari.properties
+}
+
+check_enabled () {
+    grep -e "ambari.ldap.isConfigured=true" /etc/ambari-server/conf/ambari.properties
+}
+
+check_disabled() {
+    grep -e "ambari.ldap.isConfigured=false" /etc/ambari-server/conf/ambari.properties
+}
+
+enable_ldap() {
+
+  # add properties if required
+  check_ldap_properties
+  if [ $? -ne 0 ]; then
+  cat >>/etc/ambari-server/conf/ambari.properties <<EOL
+ambari.ldap.isConfigured=<%= @ldapIsConfigured %>
+authentication.ldap.baseDn=<%= @baseDn %>
+authentication.ldap.bindAnonymously=<%= @bindAnonymously %>
+authentication.ldap.dnAttribute=<%= @dnAttribute %>
+authentication.ldap.groupMembershipAttr=<%= @groupMembershipAttr %>
+authentication.ldap.groupNamingAttr=<%= @groupNamingAttr %>
+authentication.ldap.groupObjectClass=<%= @groupObjectClass %>
+authentication.ldap.managerDn=<%= @managerDn %>
+authentication.ldap.managerPassword=/etc/ambari-server/conf/.ldap-pass
+authentication.ldap.primaryUrl=<%= @primaryUrl %>
+<% unless @secondaryUrl.nil? -%>
+authentication.ldap.secondaryUrl=<%= @secondaryUrl %>
+<% end -%>
+authentication.ldap.referral=<%= @referral %>
+authentication.ldap.useSSL=<%= @useSSL %>
+authentication.ldap.userObjectClass=<%= @userObjectClass %>
+authentication.ldap.usernameAttribute=<%= @usernameAttribute %>
+client.security=ldap
+EOL
+  else
+    # properties already added - swith the ldap config to true
+    sed -i \
+      -e s/ambari.ldap.isConfigured=\(.*\)/ambari.ldap.isConfigured=true/ \
+      -e s/client.security=\(.*\)/client.security=ldap/  \
+      /etc/ambari-server/conf/ambari.properties
+
+  fi
+}
+
+disable_ldap() {
+  # properties already added - swith the ldap config to false
+  sed -i \
+    -e s/ambari.ldap.isConfigured=\(.*\)/ambari.ldap.isConfigured=false/ \
+    -e s/client.security=\(.*\)/client.security=local/  \
+    /etc/ambari-server/conf/ambari.properties
+}
+
+
+
+
+
+case $1 in
+    check_enabled)
+      check_enabled
+      exit $?
+    ;;
+
+    check_disabled)
+      check_disabled
+      exit $?
+    ;;
+
+    enable)
+        check_enabled
+        if [ $? -ne 0 ]; then
+            enable_ldap
+        fi
+        exit $?
+    ;;
+
+    disable)
+        check_disabed
+        if [ $? -ne 0 ]; then
+            disable_ldap
+        fi
+        exit $?
+    ;;
+
+    *)
+      echo "Invalid input"
+      exit 1
+    ;;
+
+esac

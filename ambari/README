@@ -1,0 +1,117 @@
+#ambari
+
+####Table of Contents
+
+1. [Overview](#overview)
+2. [Module Description](#module-description)
+3. [Setup](#setup)
+    * [What this module affects](#what-this-module-affects)
+    * [Setup requirements](#setup-requirements)
+    * [Beginning with Ambari](#beginning-with-Ambari1)
+4. [Usage - Configuration options and additional functionality](#usage)
+5. [Reference - An under-the-hood peek at what the module is doing and how](#reference)
+5. [Limitations - OS compatibility, etc.](#limitations)
+6. [Development - Guide for contributing to the module](#development)
+
+##Overview
+
+This module installs Ambari (the hadoop management and monitoring system) agent and/or
+server. It is tested with CentOS (6.4).         
+
+##Module Description
+
+This modules prepares the hosts for Ambari and installs Agent/Server service. This means 
+that firewall services are stopped, ntp is installed and started, machines, 
+the agent/clients are installed&started and finally the Ambari clients are given 
+information on where to find the server machine. 
+
+##Setup
+
+###What this module affects
+
+* IPTables and PackageKIT are stopped by this module as they may interfer with Ambari. 
+For anything but virtual machines you might want to re-activate these.
+* If not present, ntp is installed and started. 
+
+
+###Setup Requirements 
+
+* This module needs the module stdlib
+* Ambari relies on functioning DNS (or: the hosts must know their own hostname and be able
+ to find other hosts by node), which often you won't have (in particular when working 
+with virtual machines). See below for an example on how to handle this. 
+	
+###Beginning with Ambari	
+
+To get started with this module you need to include the following lines in your puppet file 
+to provision the Ambari server:
+
+	include ambari
+	class { 'ambari::server':
+	  ownhostname => 'one.cluster'
+	}
+
+For the agent you need to include the following lines:
+
+	include ambari
+	class { 'ambari::agent':
+  		ownhostname    => 'two.cluster',
+  		serverhostname => 'one.cluster'
+	}
+
+Ownhostname is the name of the host that is provisioned, serverhostname the name of the Ambari 
+server (the server should be running first).  
+
+##Usage
+One possible pitfall is, that you nodes must be able to contact each other using domain names 
+- something that won't work automatically when you try it out in a  cluster of virtual machines. 
+The simplest way to get this to work is to set these names yourself - see below for an example
+ puppet class.  This class sets the values necessary for a cluster consisting of just two 
+machines (one.cluster and two.cluster) to find each other. You must include a call to this class 
+like this: 
+
+class { 'etchosts':
+  ownhostname => 'two.cluster'
+}
+
+
+class etchosts ($ownhostname) {
+  host { 'host_one':
+    name  => 'one.cluster',
+    alias => ['one', 'one.cluster'],
+    ip    => '192.168.0.101'
+  }
+
+  host { 'host_two':
+    name  => 'two.cluster',
+    alias => ['two', 'two.cluster'],
+    ip    => '192.168.0.102'
+  }
+
+  file { 'agent_hostname':
+    path    => "/etc/hostname",
+    ensure  => present,
+    replace => true,
+    content => "${ownhostname}", # own hostname
+    owner   => 1546
+  }
+
+  file { 'agent_sysconfig':
+    path    => "/etc/sysconfig/network",
+    ensure  => present,
+    replace => true,
+    content => "NETWORKING=yes \nHOSTNAME=${ownhostname}" # own hostname
+  }
+
+}
+
+
+##Limitations
+This module is currently tested only on CentOS. 
+
+##Development
+If you have ideas for improvements or want to make changes yourself, please
+ contact us at <firstname>.<lastname>@codecentric.de 
+
+##Release Notes/Contributors/Etc 
+This Module was created by Malte Nottmeyer and Valentin Zacharias

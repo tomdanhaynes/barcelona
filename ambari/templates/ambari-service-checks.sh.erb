@@ -1,0 +1,10 @@
+#!/bin/bash
+USER=<%= scope.lookupvar("ambari_server::params::ambari_ui_user") %>
+PASSWD=<%= scope.lookupvar("ambari_server::params::ambari_ui_password")  %>
+CLUSTER_NAME=<%= scope.lookupvar("ambari_server::params::cluster_name")  %>
+RQ_URL="http://localhost:8080/api/v1/clusters/$CLUSTER_NAME/request_schedules/"
+RQ_VALUE=`awk '/id/''{print $3}' /var/log/ambari-service-check.log`
+CURL="curl -s -u $USER:$PASSWD -H "X-Requested-By:$USER" -X"
+
+$CURL POST -d @/etc/ambari-server/scripts/service-check-post.json -o /var/log/ambari-service-check.log $RQ_URL 2>&1
+$CURL GET $RQ_URL$RQ_VALUE  > /var/log/ambari-service-status.log

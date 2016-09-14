@@ -1,0 +1,65 @@
+{
+  "blueprint":"blueprint-<%= scope.lookupvar("ambari_server::params::blueprint_version") %>",
+  "host_groups":[
+    {
+      "name":"host_group_namenode_active",
+      "hosts":[
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::master_node1_fqdn") %>"}
+      ]
+    },
+
+    {
+      "name":"host_group_namenode_passive",
+      "hosts":[
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::master_node2_fqdn") %>"}
+      ]
+    },
+
+    {
+      "name":"host_group_zk_1",
+      "hosts":[
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::zookeeper_server1_fqdn") %>"}
+      ]
+    },
+
+    {
+      "name":"host_group_zk_2",
+      "hosts":[
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::zookeeper_server2_fqdn") %>"},
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::zookeeper_server3_fqdn") %>"}
+      ]
+    },
+
+    {
+      "name":"host_group_worker",
+      "hosts":[
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::worker_node1_fqdn") %>"},
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::worker_node2_fqdn") %>"},
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::worker_node3_fqdn") %>"}
+      ]
+    },
+
+    {
+      "name":"host_group_data_nodes",
+      "hosts":[
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::data_node1_fqdn") %>"},
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::data_node2_fqdn") %>"},
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::data_node3_fqdn") %>"}
+      ]
+    },
+
+    {
+      "name":"host_group_kafka_broker_1",
+      "hosts":[
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::kafka_broker1_fqdn") %>"}
+      ]
+    },
+
+    {
+      "name":"host_group_kafka_broker_2",
+      "hosts":[
+        { "fqdn":"<%= scope.lookupvar("ambari_server::params::kafka_broker2_fqdn") %>"}
+      ]
+    }
+  ]
+}
