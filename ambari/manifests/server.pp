@@ -25,12 +25,9 @@ class ambari::server ($ownhostname) {
   service { 'ambari-server':
     ensure  => running,
     require => [Package[ambari-server], Exec[ambari-setup]],
-    start   => Exec[ambari-server-start]
-  }
-
-  exec { 'ambari-server-start':
-    command => "ambari-server start",
-    require => Service[ambari-server],
-    onlyif  => 'ambari-server status | grep "not running"'
+    start   => 'ambari-server start',
+    stop    => 'ambari-server stop',
+    restart => 'ambari-server restart',
+    status  => 'ambari-server status | grep -q "Ambari Server running"',
   }
 }
